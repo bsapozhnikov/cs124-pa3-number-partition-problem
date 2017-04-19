@@ -2,21 +2,65 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[top=1in, left = 1in, right = 1in]{geometry}
 
-\begin{document}
 
 \title{
   CS124                    \\
   Spring Semester 2017     \\
-  Programming Assignment 3 \\
-  HUIDs: 10983185, 
+  Programming Assignment 3
 }
-\author{Brian Sapozhnikov}
-\date{Friday, 21 April}
+\author{HUIDs: 10983185, 90983768}
+\date{Friday, 21 April 2017}
+
+\begin{document}
+
+\sloppy
  
 \maketitle 
 
 \section{Dynamic Programming Solution}
+
+\subsection{Preliminaries}
+
+In this section, we will interpret the number partition problem as splitting the elements of a set $A$ between two sets $A_1$ and $A_2$ such that the absolute difference of the sums is minimized. Let $n$ be the number of elements in $A$.
+
+\subsection{Function}
+
+Let $D[m, h]$ be an indicator of whether we can achieve a residue of $h$ using the first $m$ elements of $A$. Then, assuming we have a suitable way of tracing the exact partition, getting the minimum value $i$ such that $D[n, i] = 1$ will give us our final answer.
+
+\subsection{Recurrence Relation}
+
+$m$ ranges from 1 to $n$ (we will assume that $n > 0$), and $h$ ranges from $0$ to $b = \sum\limits_{i = 1}^n a_i$ (note that $\forall S \subseteq A$, the sum of the elements in $S$ is less than $b$). We define $D$ to be
+
+\medskip
+
+\[
+  D[m, h] =
+  \begin{cases} 
+    \hfill 1 \hfill & \text{ if $m = 1$ and $h = a_1$} \\
+    \hfill 0 \hfill & \text{ if $m = 1$ and $h \neq a_1$} \\
+    \hfill \max(D[m - 1, \vert h - a_m \vert], D[m - 1, h + a_m]) & \text{ if $m > 1$.} \\
+  \end{cases}
+\]
+
+\medskip
+
+The base case is when $m = 1$: it is clear that only residue we can acheive is $a_1$, so our base cases are correct.
+
+Now, we consider when $m > 1$. Suppose that we \textit{can} achieve a residue of $h$ using the first $m$ elements. WLOG, let $A_1$ be the set with smaller sum $\sigma$, and let $A_2$ be the set with larger sum $\sigma + h$. It follows that the residue when we remove $a_m$ must be either $h + a_m$ if $a_m \in A_1$ or $\vert h - a_m \vert$ if $a_m \in A_2$.
+
+Now, suppose that the residue when we split up the first $m - 1$ elements is either $h + a_m$ or $\vert h - a_m \vert$. If the residue is $h + a_m$, it is clear that putting $a_m$ in the set with smaller sum will yield a residue of $h$. If the residue is $\vert h - a_m \vert$, it is clear that putting $a_m$ in the set with smaller sum if $h < a_m$ or putting $a_m$ in the set with larger sum if $h \geq a_m$ will yield a residue of $h$.
+
+Thus, we can achieve a residue of $h$ using the first $m$ elements iff we can achieve a residue of $h + a_m$ or $\vert h - a_m \vert$ among the first $m - 1$ elements, and thus the recursion is correct, as $D[m, h] = 1$ iff $D[m - 1, \vert h - a_m \vert] = 1 \lor  D[m - 1, h + a_m] = 1$.
+
+\subsection{Algorithm}
+
+First, we number the elements in $A$ (if $A$ is in list form, we can use the indices). Then, we initialize an $n$ row by $b$ column lookup table $T$, where $D[m, h]$ corresponds to $T_{mh}$, and initialize every entry to 0. We fill in the first row (the base cases), and we fill in the subsequent rows by using the recursion. Every time we set an entry $T_{mh}$ to 1, we also store there a pointer to the previous entry corresponding the residue among the first $m - 1$ elements (except in the base case) as well as a note of whether $a_m$ was inserted into the larger or smaller set using the criteria outlined in the proof of correctness in 1.3 (breaking all ties arbitrarily). Finally, we look through the last row and find the minimum value $i$ such that $T_{ni} = 1$ (we know that at least $T_{nb} = 1$): from here, we can trace back to get the elements of the partition, and trace forwards again from $a_1$ to determine the sets that the elements are in. 
+
+\subsection{Time and Space Complexity}
+
+It is clear the the time taken by the algorithm is governed by the time needed to fill in $T$, and it follows that the algorithm takes $O(nb)$ time. In each table entry, we store a constant amount of information, and thus the algorithm uses $O(nb)$ space. 
 
 \section{Karmarkar-Karp Algorithm}
 
