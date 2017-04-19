@@ -1,0 +1,25 @@
+\documentclass[10pt,letter]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+\title{
+  CS124                    \\
+  Spring Semester 2017     \\
+  Programming Assignment 3 \\
+  HUIDs: 10983185, 
+}
+\author{Brian Sapozhnikov}
+\date{Friday, 21 April}
+ 
+\maketitle 
+
+\section{Dynamic Programming Solution}
+
+\section{Karmarkar-Karp Algorithm}
+
+We describe the algorithm for implementing the Karmarkar-Karp algorithm in $O(n\log{n})$ steps. First we sort the array $A$, which we can do in $O(n\log{n})$ time. Then we repeat the following $n$ times: pop the 2 largest elements $x,y$ off of $A$ and insert $|x-y|$ into the array. Popping the maximum off a sorted list takes constant time, we assume the values in $A$ are small enough that calculating $|x-y|$ takes constant time, and inserting into a sorted array takes $O(\log{n})$ time. Thus this implementation takes $O(n\log{n})$ time.
+
+\end{document}
