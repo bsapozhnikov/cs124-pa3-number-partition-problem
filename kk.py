@@ -1,7 +1,8 @@
-from sys import argv, exit
+from sys import argv, exit, maxint
 import random
 
 INPUT_LEN = 100
+NUM_TRIALS = 2
 
 def getArray(filename="ones.txt"):
     inputfile = open(filename, 'r')
@@ -49,6 +50,15 @@ def genPrepartition():
         P.append(random.randint(1,INPUT_LEN))
     return P
 
+### Repeated Random with solution sequences ###
+def rrSeq(A):
+    minResidue = maxint
+    for _ in xrange(NUM_TRIALS):
+        S = genSolutionSeq()
+        residue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+        minResidue = min(residue, minResidue)
+    return minResidue
+
 def main():
     A = []
     if len(argv) < 2:
@@ -57,7 +67,8 @@ def main():
         A = getArray()
     else:
         A = getArray(argv[1])
-    print kk(A)
+    print kk(A[:])
+    print rrSeq(A[:])
     
 main()
 
