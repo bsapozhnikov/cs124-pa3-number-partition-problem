@@ -1,9 +1,12 @@
 from sys import argv, exit
+import random
+
+INPUT_LEN = 100
 
 def getArray(filename="ones.txt"):
     inputfile = open(filename, 'r')
     A = []
-    for _ in xrange(100):
+    for _ in xrange(INPUT_LEN):
         A.append(int(inputfile.readline()))
     return A
 
@@ -21,7 +24,7 @@ def binsert(A, x):
         else:
             j = k
     A.insert(i, x)
-
+    
 def kk(A):
     A.sort()
     for _ in xrange(len(A)-1):
@@ -29,6 +32,14 @@ def kk(A):
         m2 = A.pop()
         binsert(A, abs(m1 - m2))
     return A[0]
+
+### Generate and return a random solution  ###
+###   represented as a list of +1s and -1s ###
+def genSolutionSeq():
+    S = []
+    for _ in xrange(INPUT_LEN):
+        S.append(random.choice([-1,1]))
+    return S
 
 def main():
     A = []
