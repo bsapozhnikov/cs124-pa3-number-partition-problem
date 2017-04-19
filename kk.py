@@ -50,6 +50,14 @@ def genPrepartition():
         P.append(random.randint(0,INPUT_LEN - 1))
     return P
 
+### Partition a list given a prepartition ###
+def prePartition(A, P):
+    APartitioned = [0] * INPUT_LEN
+    for i in xrange(INPUT_LEN):
+        APartitioned[P[i]] += A[i]
+    return APartitioned
+    
+
 ### Generate and return a random       ###
 ###   neighbor for a solution sequence ###
 def genSeqNeighbor(S):
@@ -82,9 +90,7 @@ def rrPrePart(A):
     minResidue = maxint
     for _ in xrange(NUM_TRIALS):
         P = genPrepartition()
-        APartitioned = [0] * INPUT_LEN
-        for i in xrange(INPUT_LEN):
-            APartitioned[P[i]] += A[i]
+        APartitioned = prePartition(A, P)
         residue = kk(APartitioned)
         minResidue = min(residue, minResidue)
     return minResidue
@@ -100,7 +106,20 @@ def hcSeq(A):
             S = SNeighbor
             minResidue = residue
     return minResidue
-        
+
+### Hill Climbing with prepartitions ###
+def hcPrePart(A):
+    P = genPrepartition()
+    APartitioned = prePartition(A, P)
+    minResidue = kk(APartitioned)
+    for _ in xrange(NUM_TRIALS):
+        PNeighbor = genPrePartNeighbor(P[:])
+        APartitioned = prePartition(A, PNeighbor)
+        residue = kk(APartitioned)
+        if residue < minResidue:
+            P = PNeighbor
+            minResidue = residue
+    return minResidue
 
 def main():
     A = []
@@ -114,6 +133,7 @@ def main():
     print rrSeq(A[:])
     print rrPrePart(A[:])
     print hcSeq(A[:])
+    print hcPrePart(A[:])
     
 main()
 
