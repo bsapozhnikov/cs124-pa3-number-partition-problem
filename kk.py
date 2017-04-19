@@ -26,15 +26,6 @@ def binsert(A, x):
             j = k
     A.insert(i, x)
     
-### Return residue given array A and sequence S ###
-###   A[i] is in partition "1" iff S[i] == 1    ###
-###   else A[i] is in partition "-1"            ###
-### Invariants:                                 ###
-###   S[i] == 1 or S[i] == -1 for all i         ###
-###   len(A) == len(S) == INPUT_LEN             ###
-def getResidue(A,S):
-    return abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
-    
 def kk(A):
     A.sort()
     for _ in xrange(len(A)-1):
@@ -85,12 +76,29 @@ def genPrePartNeighbor(P):
     P[sample[0]] = sample[1]
     return P
     
+### Return residue given array A and sequence S ###
+###   A[i] is in partition "1" iff S[i] == 1    ###
+###   else A[i] is in partition "-1"            ###
+### Invariants:                                 ###
+###   S[i] == 1 or S[i] == -1 for all i         ###
+###   len(A) == len(S) == INPUT_LEN             ###
+def getResidueSeq(A,S):
+    return abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    
+### Return residue given array A and partition P ###
+###   A[i] is in partition group P[i]            ###
+### Invariants:                                  ###
+###   len(A) == len(P) == INPUT_LEN              ###
+###   0 <= P[i] <= INPUT_LEN for all i           ###
+def getResiduePP(A,P):
+    return kk(prePartition(A,P))
+
 ### Repeated Random with solution sequences ###
 def rrSeq(A):
     minResidue = maxint
     for _ in xrange(NUM_TRIALS):
         S = genSolutionSeq()
-        residue = getResidue(A, S)
+        residue = getResidueSeq(A, S)
         minResidue = min(residue, minResidue)
     return minResidue
 
@@ -99,18 +107,17 @@ def rrPrePart(A):
     minResidue = maxint
     for _ in xrange(NUM_TRIALS):
         P = genPrepartition()
-        APartitioned = prePartition(A, P)
-        residue = kk(APartitioned)
+        residue = getResiduePP(A, P)
         minResidue = min(residue, minResidue)
     return minResidue
 
 ### Hill Climbing with solution sequences ###
 def hcSeq(A):
     S = genSolutionSeq()
-    minResidue = getResidue(A, S)
+    minResidue = getResidueSeq(A, S)
     for _ in xrange(NUM_TRIALS):
         SNeighbor = genSeqNeighbor(S[:])
-        residue = getResidue(A, SNeighbor)
+        residue = getResidueSeq(A, SNeighbor)
         if residue < minResidue:
             S = SNeighbor
             minResidue = residue
@@ -119,12 +126,10 @@ def hcSeq(A):
 ### Hill Climbing with prepartitions ###
 def hcPrePart(A):
     P = genPrepartition()
-    APartitioned = prePartition(A, P)
-    minResidue = kk(APartitioned)
+    minResidue = getResiduePP(A, P)
     for _ in xrange(NUM_TRIALS):
         PNeighbor = genPrePartNeighbor(P[:])
-        APartitioned = prePartition(A, PNeighbor)
-        residue = kk(APartitioned)
+        residue = getResiduePP(A, PNeighbor)
         if residue < minResidue:
             P = PNeighbor
             minResidue = residue
@@ -137,11 +142,11 @@ def saCooling(i):
 ### Simulated Annealing with solution sequences ###
 def saSeq(A):
     S = genSolutionSeq()
-    minResidue = getResidue(A, S)
+    minResidue = getResidueSeq(A, S)
     for i in xrange(NUM_TRIALS):
         SNeighbor = genSeqNeighbor(S[:])
-        residueS = getResidue(A, S)
-        residueSNeighbor = getResidue(A, SNeighbor)
+        residueS = getResidueSeq(A, S)
+        residueSNeighbor = getResidueSeq(A, SNeighbor)
         if residueSNeighbor < residueS:
             S = SNeighbor
             residueS = residueSNeighbor
@@ -156,22 +161,18 @@ def saSeq(A):
 ### Simulated Annealing with prepartitions ###
 def saPrePart(A):
     P = genPrepartition()
-    APartitioned = prePartition(A, P)
-    minResidue = kk(APartitioned)
+    minResidue = getResiduePP(A, P)
     for i in xrange(NUM_TRIALS):
         PNeighbor = genPrePartNeighbor(P[:])
-        APartitionedNeighbor = prePartition(A, PNeighbor)
-        residueP = kk(APartitioned)
-        residuePNeighbor = kk(APartitionedNeighbor)
+        residueP = getResiduePP(A, P)
+        residuePNeighbor = getResiduePP(A, PNeighbor)
         if residuePNeighbor < residueP:
             P = PNeighbor
-            APartitioned = APartitionedNeighbor
             residueP = residuePNeighbor
         else:
             moveProb = math.exp(-1.0 * (residuePNeighbor - residueP) / saCooling(i))
             if random.uniform(0, 1) <= moveProb:
                 P = PNeighbor
-                APartitioned = APartitionedNeighbor
                 residueP = residuePNeighbor
         minResidue = min(residueP, minResidue)
     return minResidue
