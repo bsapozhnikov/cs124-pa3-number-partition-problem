@@ -152,8 +152,29 @@ def saSeq(A):
                 residueS = residueSNeighbor
         minResidue = min(residueS, minResidue)
     return minResidue
-    
 
+### Simulated Annealing with prepartitions ###
+def saPrePart(A):
+    P = genPrepartition()
+    APartitioned = prePartition(A, P)
+    minResidue = kk(APartitioned)
+    for i in xrange(NUM_TRIALS):
+        PNeighbor = genPrePartNeighbor(P[:])
+        APartitionedNeighbor = prePartition(A, PNeighbor)
+        residueP = kk(APartitioned)
+        residuePNeighbor = kk(APartitionedNeighbor)
+        if residuePNeighbor < residueP:
+            P = PNeighbor
+            APartitioned = APartitionedNeighbor
+            residueP = residuePNeighbor
+        else:
+            moveProb = math.exp(-1.0 * (residuePNeighbor - residueP) / saCooling(i))
+            if random.uniform(0, 1) <= moveProb:
+                P = PNeighbor
+                APartitioned = APartitionedNeighbor
+                residueP = residuePNeighbor
+        minResidue = min(residueP, minResidue)
+    return minResidue
 
 def main():
     A = []
@@ -169,6 +190,7 @@ def main():
     print hcSeq(A[:])
     print hcPrePart(A[:])
     print saSeq(A[:])
+    print saPrePart(A[:])
     
 main()
 
