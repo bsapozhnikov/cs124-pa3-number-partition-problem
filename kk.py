@@ -41,6 +41,14 @@ def genSolutionSeq():
         S.append(random.choice([-1,1]))
     return S
 
+### Generate and return a random prepartition   ###
+###   represented as a list of random group ids ###
+def genPrepartition():
+    P = []
+    for _ in xrange(INPUT_LEN):
+        P.append(random.randint(1,INPUT_LEN))
+    return P
+
 def main():
     A = []
     if len(argv) < 2:
