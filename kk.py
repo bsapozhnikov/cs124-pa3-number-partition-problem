@@ -25,7 +25,6 @@ def binsert(A, x):
 def kk(A):
     A.sort()
     for _ in xrange(len(A)-1):
-        print A
         m1 = A.pop()
         m2 = A.pop()
         binsert(A, abs(m1 - m2))
@@ -39,7 +38,6 @@ def main():
         A = getArray()
     else:
         A = getArray(argv[1])
-    A = [6,8,5,7,10]
     print kk(A)
     
 main()
