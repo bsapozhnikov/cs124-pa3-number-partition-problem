@@ -26,6 +26,15 @@ def binsert(A, x):
             j = k
     A.insert(i, x)
     
+### Return residue given array A and sequence S ###
+###   A[i] is in partition "1" iff S[i] == 1    ###
+###   else A[i] is in partition "-1"            ###
+### Invariants:                                 ###
+###   S[i] == 1 or S[i] == -1 for all i         ###
+###   len(A) == len(S) == INPUT_LEN             ###
+def getResidue(A,S):
+    return abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    
 def kk(A):
     A.sort()
     for _ in xrange(len(A)-1):
@@ -81,7 +90,7 @@ def rrSeq(A):
     minResidue = maxint
     for _ in xrange(NUM_TRIALS):
         S = genSolutionSeq()
-        residue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+        residue = getResidue(A, S)
         minResidue = min(residue, minResidue)
     return minResidue
 
@@ -98,10 +107,10 @@ def rrPrePart(A):
 ### Hill Climbing with solution sequences ###
 def hcSeq(A):
     S = genSolutionSeq()
-    minResidue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    minResidue = getResidue(A, S)
     for _ in xrange(NUM_TRIALS):
         SNeighbor = genSeqNeighbor(S[:])
-        residue = abs(sum(A[i] * SNeighbor[i] for i in xrange(INPUT_LEN)))
+        residue = getResidue(A, SNeighbor)
         if residue < minResidue:
             S = SNeighbor
             minResidue = residue
@@ -128,11 +137,11 @@ def saCooling(i):
 ### Simulated Annealing with solution sequences ###
 def saSeq(A):
     S = genSolutionSeq()
-    minResidue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    minResidue = getResidue(A, S)
     for i in xrange(NUM_TRIALS):
         SNeighbor = genSeqNeighbor(S[:])
-        residueS = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
-        residueSNeighbor = abs(sum(A[i] * SNeighbor[i] for i in xrange(INPUT_LEN)))
+        residueS = getResidue(A, S)
+        residueSNeighbor = getResidue(A, SNeighbor)
         if residueSNeighbor < residueS:
             S = SNeighbor
             residueS = residueSNeighbor
