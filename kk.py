@@ -50,6 +50,24 @@ def genPrepartition():
         P.append(random.randint(0,INPUT_LEN - 1))
     return P
 
+### Generate and return a random       ###
+###   neighbor for a solution sequence ###
+def genSeqNeighbor(S):
+    sample = random.sample(xrange(INPUT_LEN), 2)
+    S[sample[0]] *= -1
+    if (random.randint(0, 1)):
+        S[sample[1]] *= -1
+    return S
+
+### Generate and return a random  ###
+###   neighbor for a prepartition ###
+def genPrePartNeighbor(P):
+    sample = random.sample(xrange(INPUT_LEN), 2)
+    while (P[sample[0]] == sample[1]):
+        sample = random.sample(xrange(INPUT_LEN), 2)
+    P[sample[0]] = sample[1]
+    return P
+    
 ### Repeated Random with solution sequences ###
 def rrSeq(A):
     minResidue = maxint
@@ -71,6 +89,19 @@ def rrPrePart(A):
         minResidue = min(residue, minResidue)
     return minResidue
 
+### Hill Climbing with solution sequences ###
+def hcSeq(A):
+    S = genSolutionSeq()
+    minResidue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    for _ in xrange(NUM_TRIALS):
+        SNeighbor = genSeqNeighbor(S[:])
+        residue = abs(sum(A[i] * SNeighbor[i] for i in xrange(INPUT_LEN)))
+        if residue < minResidue:
+            S = SNeighbor
+            minResidue = residue
+    return minResidue
+        
+
 def main():
     A = []
     if len(argv) < 2:
@@ -82,6 +113,7 @@ def main():
     print kk(A[:])
     print rrSeq(A[:])
     print rrPrePart(A[:])
+    print hcSeq(A[:])
     
 main()
 
