@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    printf("Usage: ./kk inputfile");
+    printf("Usage: ./kk inputfile\n");
     return 1;
   }
   char *py_argv[3];
