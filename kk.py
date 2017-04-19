@@ -1,5 +1,5 @@
 from sys import argv, exit, maxint
-import random
+import random, math
 
 INPUT_LEN = 100
 NUM_TRIALS = 25000
@@ -121,6 +121,31 @@ def hcPrePart(A):
             minResidue = residue
     return minResidue
 
+### Cooling schedule function for simulated annealing ###
+def saCooling(i):
+    return (10**8) * (0.8**(i // 300))
+
+### Simulated Annealing with solution sequences ###
+def saSeq(A):
+    S = genSolutionSeq()
+    minResidue = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+    for i in xrange(NUM_TRIALS):
+        SNeighbor = genSeqNeighbor(S[:])
+        residueS = abs(sum(A[i] * S[i] for i in xrange(INPUT_LEN)))
+        residueSNeighbor = abs(sum(A[i] * SNeighbor[i] for i in xrange(INPUT_LEN)))
+        if residueSNeighbor < residueS:
+            S = SNeighbor
+            residueS = residueSNeighbor
+        else:
+            moveProb = math.exp(-1.0 * (residueSNeighbor - residueS) / saCooling(i))
+            if random.uniform(0, 1) <= moveProb:
+                S = SNeighbor
+                residueS = residueSNeighbor
+        minResidue = min(residueS, minResidue)
+    return minResidue
+    
+
+
 def main():
     A = []
     if len(argv) < 2:
@@ -134,6 +159,7 @@ def main():
     print rrPrePart(A[:])
     print hcSeq(A[:])
     print hcPrePart(A[:])
+    print saSeq(A[:])
     
 main()
 
