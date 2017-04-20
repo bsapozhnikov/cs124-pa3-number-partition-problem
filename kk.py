@@ -233,6 +233,8 @@ def main():
         A = genRandArray()
     else:
         A = getArray(argv[1])
+        print kk(A[:])
+        return
     ## cannot decorate KK since it's used by other functions
     print "KK:  " + str(experiment(kk)(A[:]))
     print "RRS: " + str(rrSeq(A[:]))
