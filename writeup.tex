@@ -56,7 +56,7 @@ Thus, we can achieve a residue of $h$ using the first $m$ elements iff we can ac
 
 \subsection{Algorithm}
 
-First, we number the elements in $A$ (if $A$ is in list form, we can use the indices). Then, we initialize an $n$ row by $b$ column lookup table $T$, where $D[m, h]$ corresponds to $T_{mh}$, and initialize every entry to 0. We fill in the first row (the base cases), and we fill in the subsequent rows by using the recursion. Every time we set an entry $T_{mh}$ to 1, we also store there a pointer to the previous entry corresponding the residue among the first $m - 1$ elements (except in the base case) as well as a note of whether $a_m$ was inserted into the larger or smaller set using the criteria outlined in the proof of correctness in 1.3 (breaking all ties arbitrarily). Finally, we look through the last row and find the minimum value $i$ such that $T_{ni} = 1$ (we know that at least $T_{nb} = 1$): from here, we can trace back to get the elements of the partition, and trace forwards again from $a_1$ to determine the sets that the elements are in. 
+First, we number the elements in $A$ (if $A$ is in list form, we can use the indices). Then, we initialize an $n$ row by $b+1$ column lookup table $T$, where $D[m, h]$ corresponds to $T_{mh}$, and initialize every entry to 0. We fill in the first row (the base cases), and we fill in the subsequent rows by using the recursion. Every time we set an entry $T_{mh}$ to 1, we also store there a pointer to the previous entry corresponding the residue among the first $m - 1$ elements (except in the base case) as well as a note of whether $a_m$ was inserted into the larger or smaller set using the criteria outlined in the proof of correctness in \S 1.3 (breaking all ties arbitrarily). Finally, we look through the last row and find the minimum value $i$ such that $T_{ni} = 1$ (we know that at least $T_{nb} = 1$). From here, we can trace back to get the elements of the partition, and trace forwards again from $a_1$ to determine the sets that the elements are in. 
 
 \subsection{Time and Space Complexity}
 
@@ -86,9 +86,9 @@ We describe the algorithm for implementing the Karmarkar-Karp algorithm in $O(n\
     \hline
     Repeated Random with Prepartitions & 156 & 8.184 \\
     \hline
-    Hill Climbing with Sequences & 779 & 4.859 \\
+    Hill Climbing with Prepartitions & 779 & 4.859 \\
     \hline
-    Simulated Annealing with Sequences & 215 & 9.685 \\
+    Simulated Annealing with Prepartitions & 215 & 9.685 \\
     \hline
     
   \end{tabular}
@@ -96,10 +96,22 @@ We describe the algorithm for implementing the Karmarkar-Karp algorithm in $O(n\
 
 \subsection{Residue Analysis}
 
+Overall, we see that Karmarkar-Karp yields a reasonable approximation relative to the random algorithms using sequences. Karmarkar-Karp captures the intuitive notion that the larger elements of the array should be on different sides of the partition. Sequences, on the other hand, randomly assign elements to be on different sides of the partition, and so we expect that the results they yield are less optimal, even combined with the approximation algorithms.
+
+Prepartitions, on the other hand, use Karmarkar-Karp and thus add randomness while still preserving our intuitive heuristic. In addition, it is not surprising that prepartitioning is superior to sequencing because prepartitions are more general: a sequence describes two groups of vertices, where all the vertices in a group should be on the same side of the partition. This is more restrictive than a prepartition, which describes up to 100 groups of vertices. Thus prepartitioning allows the randomized algorithms to explore more of the solution space, which (as expected) yields better approximations.
+
+Furthermore, our prepartition results show that exploring more of the solution space is better than optimizing locally. This explains why the repeated random algorithm performed the best, the hill climbing algorithm performed the worst, and the simulated annealing algorithm performed in between (it combines random exploration with local optimization). We do not see this trend extend to simulated annealing with sequences. This is because with simulated annealing, we move from the current sequence $S$ to its neighbor with probability 1 if the neighbor yields a lower residue and probability $\mathrm{exp}(-(\mathrm{res}(S_{neighbor}) - \mathrm{res}(S))/T(\mathrm{iter}))$ otherwise. However, because the residues we get when working with sequences are huge, it reasonably follows that the difference of residues in the probability expression is also huge, from which it follows that the probability of moving from $S$ to its neighbor is quite close to 0. Thus, the simulated annealing algorithm with sequences is essentially just the hill climbing algorithm with sequences. We see that both the hill climbing algorithm with sequences and simulated annealing algorithm with sequences performed worse than the repeated random algorithm with sequences, affirming the importance of exploring the state space. 
+
 \subsection{Runtime Analysis}
+
+One major trend we see in our runtime data is that the randomized algorithms that use sequences are faster than those that use prepartitioning. This is due to the fact that calculating the residue of a partition given a sequence requires the linear operation of iterating through the array and sequence and keeping track of a running sum, while calculating the residue of a partition given a prepartition requires running the Karmarkar-Karp algorithm (which requires sorting the array and iterating over it).
+
+We also see that the hill climbing algorithm is the fastest randomized algorithm using both sequences and prepartitions. Unlike the repeated random algorithms, hill climbing and simulated annealing do not require generating a new random sequence/prepartition (a linear time operation) on each iteration; we simply generate a new neighbor (a constant time operation). The result is that the repeated random algorithms are relatively slow. The simulated annealing algorithms are the only ones that calculate residues twice per iteration. This has a noticeable effect on the runtimes, especially in the case of simulated annealing with prepartitioning since in that case calculating the residue requires running Karmarkar-Karp. This factor causes simulated annealing to be slower than hill climbing, and in fact with prepartitions simulated annealing is even slower than the repeated random algorithm.
+
+Finally, we see that Karmarkar-Karp is substantially faster than the randomized algorithms. Since it is deterministic, it only needs to run for one iteration, while the other algorithms iterate 25,000 times.
 
 \section{A Brief Discussion on Using KK as a Starting Point}
 
-The Karmarkar-Karp algorithm, as we saw in our experiment, is a good heuristic for solving the number heuristic problem, and it is very fast as well. Instead of starting with a random solution in the randonmized solutions, we can start with the solution given by the Karmarkar-Karp algorithm: it follows that the solutions we get from the randomized algorithms must be at least as good as the solution given by the Karmarkar-Karp algorithm. While this may have less of an effect with the randomized algorithms that use prepartitions, this will greatly improve the accuracy of the randomized algorithms that use sequences (at the very least, the answers they return will be orders of magnitude more accurate than before).
+The Karmarkar-Karp algorithm, as we saw in our experiment, is a good heuristic for solving the number partition problem, and it is very fast as well. Instead of starting with a random solution in the randomized algorithms, we can start with the solution given by the Karmarkar-Karp algorithm: it follows that the solutions we get from the randomized algorithms must be at least as good as the solution given by the Karmarkar-Karp algorithm. While this may have less of an effect with the randomized algorithms that use prepartitions, this will greatly improve the accuracy of the randomized algorithms that use sequences (at the very least, the answers they return will be orders of magnitude more accurate than before). For example with the hill-climbing algorithm, starting from a solution that is closer on average to the optimal than a random solution increases the chance that the solution is on a ``hill'' with a more optimal ``peak'' i.e. on a noisy solution space, the probability that hill-climbing yields the optimal increases significantly with better seed solutions such as that returned by Karmarkar-Karp.
 
 \end{document}
