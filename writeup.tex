@@ -66,4 +66,40 @@ It is clear the the time taken by the algorithm is governed by the time needed t
 
 We describe the algorithm for implementing the Karmarkar-Karp algorithm in $O(n\log{n})$ steps. First we sort the array $A$, which we can do in $O(n\log{n})$ time. Then we repeat the following $n$ times: pop the 2 largest elements $x,y$ off of $A$ and insert $|x-y|$ into the array. Popping the maximum off a sorted list takes constant time, we assume the values in $A$ are small enough that calculating $|x-y|$ takes constant time, and inserting into a sorted array takes $O(\log{n})$ time. Thus this implementation takes $O(n\log{n})$ time.
 
+\section{Results and Analysis}
+
+\subsection{Results}
+
+\begin{figure}[h]
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Algorithm & Average Residue & Average Runtime \\
+    \hline
+    Karmarkar-Karp & 256404 & 0.000178 \\
+    \hline
+    Repeated Random with Sequences & 276491590 & 1.892 \\
+    \hline
+    Hill Climbing with Sequences & 345230333 & 0.412 \\
+    \hline
+    Simulated Annealing with Sequences & 370571746 & 0.719 \\
+    \hline
+    Repeated Random with Prepartitions & 156 & 8.184 \\
+    \hline
+    Hill Climbing with Sequences & 779 & 4.859 \\
+    \hline
+    Simulated Annealing with Sequences & 215 & 9.685 \\
+    \hline
+    
+  \end{tabular}
+\end{figure}
+
+\subsection{Residue Analysis}
+
+\subsection{Runtime Analysis}
+
+\section{A Brief Discussion on Using KK as a Starting Point}
+
+The Karmarkar-Karp algorithm, as we saw in our experiment, is a good heuristic for solving the number heuristic problem, and it is very fast as well. Instead of starting with a random solution in the randonmized solutions, we can start with the solution given by the Karmarkar-Karp algorithm: it follows that the solutions we get from the randomized algorithms must be at least as good as the solution given by the Karmarkar-Karp algorithm. While this may have less of an effect with the randomized algorithms that use prepartitions, this will greatly improve the accuracy of the randomized algorithms that use sequences (at the very least, the answers they return will be orders of magnitude more accurate than before).
+
 \end{document}
